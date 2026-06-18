@@ -40,6 +40,7 @@ composer create-project componenta/skeleton my-app
 - WebSocket-пресет создает `bin/websocket.php`, `config/websocket.php` и стартовое приложение `src/WebSocket/WelcomeApplication.php`;
 - CQRS, политики доступа, аутентификацию, Cycle ORM и WebSocket-дополнение можно включить или выключить интерактивно; пресет Full включает CQRS, политики доступа, аутентификацию и Cycle ORM автоматически;
 - если включена аутентификация, CQRS и политики доступа включаются принудительно;
+- установка создает локальный файл `.env` напрямую; в установленном проекте не остается второго шаблона окружения;
 - CLI-команды запускаются через `php bin/console.php`.
 
 Подробнее: [`componenta/cqrs-app`](https://github.com/componenta/cqrs-app/blob/main/README.ru.md) описывает интеграцию команд и запросов, [`componenta/policy-app`](https://github.com/componenta/policy-app/blob/main/README.ru.md) описывает интеграцию политик, [`componenta/auth`](https://github.com/componenta/auth/blob/main/README.ru.md) описывает аутентификацию, [`componenta/cycle-app`](https://github.com/componenta/cycle-app/blob/main/README.ru.md) описывает Cycle ORM.
@@ -187,7 +188,7 @@ final class ConfigProvider extends \Componenta\Config\ConfigProvider
 
 ## Режим разработки и сборочный режим
 
-По умолчанию `.env.dist` содержит:
+Во время установки skeleton создает `.env` напрямую. В установленном проекте не остается второго шаблона окружения. Созданный `.env` начинает работу в режиме разработки:
 
 ```dotenv
 APP_ENV=development
@@ -981,7 +982,7 @@ CLI-пресет не создает `public/`, `config/routes.php`, `config/pip
 
 | Путь | Назначение |
 |---|---|
-| `.env` | Локальное окружение. Создается из `.env.dist`. |
+| `.env` | Локальное окружение. Создается установщиком. |
 | `config/config.php` | Главная декларация провайдеров и обнаружения классов. |
 | `config/container.php` | Сборка контейнера приложения. |
 | `config/componenta-providers.php` | Сгенерированный список провайдеров установленных пакетов. Появляется после работы `componenta/composer-plugin`. |

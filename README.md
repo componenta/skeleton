@@ -40,6 +40,7 @@ After the preset is selected, the installer configures project requirements and 
 - the WebSocket preset creates `bin/websocket.php`, `config/websocket.php`, and the starter application `src/WebSocket/WelcomeApplication.php`;
 - CQRS, policies, authentication, Cycle ORM, and the WebSocket add-on can be enabled or disabled interactively; the Full preset enables CQRS, policies, authentication, and Cycle ORM automatically;
 - when authentication is enabled, CQRS and policies are forced on;
+- installation creates a local `.env` file directly; the installed project does not keep a second environment template;
 - CLI commands are executed through `php bin/console.php`.
 
 Details: [`componenta/cqrs-app`](https://github.com/componenta/cqrs-app/blob/main/README.md) describes command and query integration, [`componenta/policy-app`](https://github.com/componenta/policy-app/blob/main/README.md) describes policy integration, [`componenta/auth`](https://github.com/componenta/auth/blob/main/README.md) describes authentication, and [`componenta/cycle-app`](https://github.com/componenta/cycle-app/blob/main/README.md) describes Cycle ORM.
@@ -187,7 +188,7 @@ Details: [`componenta/class-finder`](https://github.com/componenta/class-finder/
 
 ## Development And Build Modes
 
-By default `.env.dist` contains:
+During installation the skeleton creates `.env` directly. The installed project does not keep a second environment template. The generated `.env` starts in development mode:
 
 ```dotenv
 APP_ENV=development
@@ -980,7 +981,7 @@ Details: [`componenta/app-console`](https://github.com/componenta/app-console/bl
 
 | Path | Purpose |
 |---|---|
-| `.env` | Local environment file created from `.env.dist`. |
+| `.env` | Local environment file created by the installer. |
 | `config/config.php` | Main declaration of providers and discovery. |
 | `config/container.php` | Application container assembly. |
 | `config/componenta-providers.php` | Generated provider list for installed packages. Created by `componenta/composer-plugin`. |

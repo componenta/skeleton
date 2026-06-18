@@ -147,6 +147,12 @@ final class Installer
         'psr/log',
     ];
 
+    private const string DEFAULT_ENV = <<<'ENV'
+APP_ENV=development
+APP_DEBUG=true
+
+ENV;
+
     private const array PACKAGE_VERSIONS = [
         'componenta/app' => '^1.0',
         'componenta/app-console' => '^1.0',
@@ -443,10 +449,9 @@ final class Installer
         }
 
         $env = $root . DIRECTORY_SEPARATOR . '.env';
-        $envDist = $root . DIRECTORY_SEPARATOR . '.env.dist';
 
-        if (!is_file($env) && is_file($envDist) && !copy($envDist, $env)) {
-            throw new RuntimeException(sprintf('Unable to copy "%s" to "%s".', $envDist, $env));
+        if (!is_file($env) && file_put_contents($env, self::DEFAULT_ENV) === false) {
+            throw new RuntimeException(sprintf('Unable to write "%s".', $env));
         }
 
     }
@@ -708,6 +713,7 @@ final class Installer
             . DIRECTORY_SEPARATOR . 'autoload'
             . DIRECTORY_SEPARATOR . 'app.local.php.dist',
         );
+        $this->removePath($root . DIRECTORY_SEPARATOR . '.env.dist');
     }
 
     private function syncComposerPackage(): void
