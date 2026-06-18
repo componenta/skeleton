@@ -1,0 +1,10 @@
+<?php
+
+declare(strict_types=1);
+
+use Componenta\App\ConfigKey;
+
+return [
+    ConfigKey::CACHE_DEV_DIR => 'var/cache/dev',
+    ConfigKey::CACHE_RUNTIME_DIR => 'var/cache/runtime',
+];

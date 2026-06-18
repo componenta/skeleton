@@ -1,0 +1,9 @@
+/vendor/
+/.env
+/var/cache/
+/log/
+/storage/
+/composer.lock
+/console.cmd
+/config/autoload/*.local.php
+/.phpunit.cache/
