@@ -261,7 +261,7 @@ static function (ContainerValue $container): App\Service\Reporter {
 }
 ```
 
-Подробнее: [`componenta/di`](https://github.com/componenta/di/blob/main/README.ru.md) описывает DI-контейнер, фабрики, атрибуты и резолверы свойств; [`componenta/config`](https://github.com/componenta/config/blob/main/README.ru.md) описывает формат конфигурационных массивов.
+Подробнее: [`componenta/di`](https://github.com/componenta/di/blob/main/README.ru.md) описывает DI-контейнер, фабрики, атрибуты и обработчики атрибутов; [`componenta/config`](https://github.com/componenta/config/blob/main/README.ru.md) описывает формат конфигурационных массивов.
 
 ## Конфиг приложения
 

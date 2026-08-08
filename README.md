@@ -261,7 +261,7 @@ static function (ContainerValue $container): App\Service\Reporter {
 }
 ```
 
-Details: [`componenta/di`](https://github.com/componenta/di/blob/main/README.md) describes the DI container, factories, attributes, and property resolvers; [`componenta/config`](https://github.com/componenta/config/blob/main/README.md) describes config array shape.
+Details: [`componenta/di`](https://github.com/componenta/di/blob/main/README.md) describes the DI container, factories, attributes, and attribute handlers; [`componenta/config`](https://github.com/componenta/config/blob/main/README.md) describes config array shape.
 
 ## Application Config
 
