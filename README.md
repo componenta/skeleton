@@ -361,13 +361,12 @@ return [
 ];
 ```
 
-In the skeleton, this registration lives in `src/ConfigProvider.php`, which is marked with `#[AsConfig]`. To add a custom bootloader, add it to `getConfig()` and register the class as an autowired service:
+In the skeleton, this registration lives in `src/ConfigProvider.php`, which is marked with `#[AsConfig]`. To add a custom bootloader, add its concrete class to `getConfig()`; DI v2 autowires concrete classes without an `autowires` config section:
 
 ```php
 namespace App;
 
 use App\Boot\WarmupBootloader;
-use App\Service\WarmupService;
 use Componenta\App\Config\AsConfig;
 use Componenta\App\ConfigKey;
 
@@ -380,14 +379,6 @@ final class ConfigProvider extends \Componenta\Config\ConfigProvider
             ConfigKey::BOOTLOADERS => [
                 WarmupBootloader::class,
             ],
-        ];
-    }
-
-    protected function getAutowires(): array
-    {
-        return [
-            WarmupBootloader::class,
-            WarmupService::class,
         ];
     }
 }

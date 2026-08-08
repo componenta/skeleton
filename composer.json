@@ -21,7 +21,7 @@
     "componenta/app-console": "^1.0.2",
     "componenta/app-http": "^1.0",
     "componenta/composer-plugin": "^1.0",
-    "componenta/config": "^1.0",
+    "componenta/config": "^2.0",
     "componenta/di": "^2.0.1",
     "componenta/error-handler-app": "^1.0",
     "componenta/http": "^1.0",

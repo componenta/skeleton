@@ -361,13 +361,12 @@ return [
 ];
 ```
 
-В скелетоне эта регистрация находится в `src/ConfigProvider.php`, который помечен `#[AsConfig]`. Если добавляете собственный загрузчик, добавьте его в `getConfig()` и зарегистрируйте класс как autowired service:
+В скелетоне эта регистрация находится в `src/ConfigProvider.php`, который помечен `#[AsConfig]`. Если добавляете собственный загрузчик, добавьте его concrete-класс в `getConfig()`; DI v2 создаёт concrete-классы автоматически и не использует секцию `autowires`:
 
 ```php
 namespace App;
 
 use App\Boot\WarmupBootloader;
-use App\Service\WarmupService;
 use Componenta\App\Config\AsConfig;
 use Componenta\App\ConfigKey;
 
@@ -380,14 +379,6 @@ final class ConfigProvider extends \Componenta\Config\ConfigProvider
             ConfigKey::BOOTLOADERS => [
                 WarmupBootloader::class,
             ],
-        ];
-    }
-
-    protected function getAutowires(): array
-    {
-        return [
-            WarmupBootloader::class,
-            WarmupService::class,
         ];
     }
 }
