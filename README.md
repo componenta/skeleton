@@ -148,7 +148,7 @@ final class ConfigProvider extends \Componenta\Config\ConfigProvider
 
 `#[AsConfig]` can target classes, functions, or methods, but the current `AttributeConfigProvider` scans discovered classes and invokes providers placed on classes. In the skeleton, the supported primary pattern is a class with `__invoke()` under `src/`.
 
-During `composer create-project`, `Installer::install()` runs on `post-root-package-install`, before Composer resolves the selected application dependencies. It rewrites `composer.json` for the chosen preset and synchronizes the active Composer root package, so only the selected PSR-7 implementation and optional packages participate in dependency resolution. `src/ConfigProvider.php` is generated for the selected preset. HTTP presets register `InterceptorConfigKey::HTTP_INTERCEPTORS` with `AttributeInterceptor::class`. CQRS presets register `CqrsConfigKey::COMMAND_MIDDLEWARES` and `CqrsConfigKey::QUERY_MIDDLEWARES`; when policies are selected, policy middleware is included in those chains. CLI and WebSocket-only presets keep this provider minimal and do not create HTTP or CQRS configuration.
+During `composer create-project`, `Installer::install()` runs on `post-root-package-install`, before Composer resolves the selected application dependencies. It rewrites `composer.json` for the chosen preset and synchronizes the active Composer root package, so only the selected PSR-7 implementation and optional packages participate in dependency resolution. `src/ConfigProvider.php` is generated for the selected preset. HTTP presets register `InterceptorConfigKey::HTTP_INTERCEPTORS` with `AttributeInterceptor::class`. CQRS presets register `CqrsConfigKey::COMMAND_MIDDLEWARES` and `CqrsConfigKey::QUERY_MIDDLEWARES`; when policies or Cycle transactions are selected, their middleware packages are installed and included in those chains. CLI and WebSocket-only presets keep this provider minimal and do not create HTTP or CQRS configuration.
 
 Details: [`componenta/config`](https://github.com/componenta/config/blob/main/README.md) describes the base `ConfigProvider`, and [`componenta/app`](https://github.com/componenta/app/blob/main/README.md) describes `AttributeConfigProvider` and discovery.
 
@@ -361,7 +361,7 @@ return [
 ];
 ```
 
-In the skeleton, this registration lives in `src/ConfigProvider.php`, which is marked with `#[AsConfig]`. To add a custom bootloader, add its concrete class to `getConfig()`; DI v2 autowires concrete classes without an `autowires` config section:
+In the skeleton, this registration lives in `src/ConfigProvider.php`, which is marked with `#[AsConfig]`. To add a custom bootloader, add its concrete class to `getConfig()`; DI autowires concrete classes without an `autowires` config section:
 
 ```php
 namespace App;

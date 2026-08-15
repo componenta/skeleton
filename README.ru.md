@@ -148,7 +148,7 @@ final class ConfigProvider extends \Componenta\Config\ConfigProvider
 
 Атрибут `#[AsConfig]` может стоять на классе, функции или методе, но текущий `AttributeConfigProvider` сканирует найденные классы и вызывает провайдеры, размещенные на классах. Для скелетона основной поддерживаемый сценарий - класс с `__invoke()` в `src/`.
 
-Во время `composer create-project` `Installer::install()` запускается на событии `post-root-package-install`, до разрешения зависимостей выбранного приложения. Установщик переписывает `composer.json` под выбранный пресет и синхронизирует активный root package Composer, поэтому в разрешении зависимостей участвуют только выбранная PSR-7 реализация и выбранные опциональные пакеты. `src/ConfigProvider.php` генерируется под выбранный пресет. HTTP-пресеты регистрируют `InterceptorConfigKey::HTTP_INTERCEPTORS` с `AttributeInterceptor::class`. CQRS-пресеты регистрируют `CqrsConfigKey::COMMAND_MIDDLEWARES` и `CqrsConfigKey::QUERY_MIDDLEWARES`; если выбраны политики доступа, в эти цепочки добавляются промежуточные обработчики политик. CLI-пресет и WebSocket-пресет оставляют этот провайдер минимальным и не создают HTTP или CQRS-конфигурацию.
+Во время `composer create-project` `Installer::install()` запускается на событии `post-root-package-install`, до разрешения зависимостей выбранного приложения. Установщик переписывает `composer.json` под выбранный пресет и синхронизирует активный root package Composer, поэтому в разрешении зависимостей участвуют только выбранная PSR-7 реализация и выбранные опциональные пакеты. `src/ConfigProvider.php` генерируется под выбранный пресет. HTTP-пресеты регистрируют `InterceptorConfigKey::HTTP_INTERCEPTORS` с `AttributeInterceptor::class`. CQRS-пресеты регистрируют `CqrsConfigKey::COMMAND_MIDDLEWARES` и `CqrsConfigKey::QUERY_MIDDLEWARES`; если выбраны политики доступа или транзакции Cycle, их middleware-пакеты устанавливаются и добавляются в соответствующие цепочки. CLI-пресет и WebSocket-пресет оставляют этот провайдер минимальным и не создают HTTP или CQRS-конфигурацию.
 
 Подробнее: [`componenta/config`](https://github.com/componenta/config/blob/main/README.ru.md) описывает базовый `ConfigProvider`, [`componenta/app`](https://github.com/componenta/app/blob/main/README.ru.md) описывает `AttributeConfigProvider` и обнаружение классов.
 
@@ -361,7 +361,7 @@ return [
 ];
 ```
 
-В скелетоне эта регистрация находится в `src/ConfigProvider.php`, который помечен `#[AsConfig]`. Если добавляете собственный загрузчик, добавьте его concrete-класс в `getConfig()`; DI v2 создаёт concrete-классы автоматически и не использует секцию `autowires`:
+В скелетоне эта регистрация находится в `src/ConfigProvider.php`, который помечен `#[AsConfig]`. Если добавляете собственный загрузчик, добавьте его concrete-класс в `getConfig()`; DI создаёт concrete-классы автоматически и не использует секцию `autowires`:
 
 ```php
 namespace App;

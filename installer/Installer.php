@@ -7,6 +7,7 @@ use Composer\Factory;
 use Composer\IO\IOInterface;
 use Composer\Json\JsonFile;
 use Composer\Package\Loader\ArrayLoader;
+use Composer\Package\Locker;
 use Composer\Script\Event;
 
 final class Installer
@@ -94,6 +95,7 @@ final class Installer
         'componenta/app-console',
         'componenta/composer-plugin',
         'componenta/config',
+        'componenta/di',
         'componenta/error-handler-app',
         'componenta/path-resolver',
     ];
@@ -114,6 +116,7 @@ final class Installer
     ];
 
     private const array POLICY_PACKAGES = [
+        'componenta/cqrs-policy',
         'componenta/policy',
         'componenta/policy-app',
     ];
@@ -124,6 +127,10 @@ final class Installer
 
     private const array CYCLE_PACKAGES = [
         'componenta/cycle-app',
+    ];
+
+    private const array CQRS_CYCLE_PACKAGES = [
+        'componenta/cqrs-transaction-cycle',
     ];
 
     private const array TEMPLATE_PACKAGES = [
@@ -154,32 +161,35 @@ APP_DEBUG=true
 ENV;
 
     private const array PACKAGE_VERSIONS = [
-        'componenta/app' => '^1.0',
-        'componenta/app-console' => '^1.0',
-        'componenta/app-http' => '^1.0',
-        'componenta/auth' => '^1.0',
-        'componenta/composer-plugin' => '^1.0',
-        'componenta/config' => '^2.0',
-        'componenta/cqrs-app' => '^2.0',
+        'componenta/app' => '^3.0.1',
+        'componenta/app-console' => '^3.0.1',
+        'componenta/app-http' => '^2.0',
+        'componenta/auth' => '^2.0.1',
+        'componenta/composer-plugin' => '^1.0.2',
+        'componenta/config' => '^2.0.1',
+        'componenta/cqrs-app' => '^3.0.1',
+        'componenta/cqrs-policy' => '^2.0.1',
+        'componenta/cqrs-transaction-cycle' => '^2.0.1',
         'componenta/clock' => '^1.0',
-        'componenta/cycle-app' => '^1.0',
-        'componenta/error-handler-app' => '^1.0',
+        'componenta/cycle-app' => '^1.0.6',
+        'componenta/di' => '^4.0.1',
+        'componenta/error-handler-app' => '^1.0.4',
         'componenta/http' => '^1.0',
-        'componenta/http-body-parsing-middleware' => '^1.0',
-        'componenta/http-psr' => '^1.0',
-        'componenta/http-psr-nyholm' => '^1.0',
-        'componenta/http-psr-diactoros' => '^1.0',
-        'componenta/http-psr-guzzle' => '^1.0',
-        'componenta/http-psr-slim' => '^1.0',
-        'componenta/interceptor' => '^1.0',
-        'componenta/interceptor-app' => '^1.0',
+        'componenta/http-body-parsing-middleware' => '^1.0.1',
+        'componenta/http-psr' => '^1.0.1',
+        'componenta/http-psr-nyholm' => '^1.0.1',
+        'componenta/http-psr-diactoros' => '^1.0.1',
+        'componenta/http-psr-guzzle' => '^1.0.1',
+        'componenta/http-psr-slim' => '^1.0.1',
+        'componenta/interceptor' => '^2.0',
+        'componenta/interceptor-app' => '^1.0.5',
         'componenta/path-resolver' => '^1.0',
-        'componenta/policy' => '^1.0',
-        'componenta/policy-app' => '^1.0',
-        'componenta/router' => '^1.0',
-        'componenta/router-app' => '^1.0',
-        'componenta/templater-app' => '^1.0',
-        'componenta/websocket-app' => '^1.0',
+        'componenta/policy' => '^1.0.5',
+        'componenta/policy-app' => '^1.0.5',
+        'componenta/router' => '^2.0',
+        'componenta/router-app' => '^3.0',
+        'componenta/templater-app' => '^1.0.4',
+        'componenta/websocket-app' => '^1.0.2',
         'pestphp/pest' => '^4.0',
         'phpunit/phpunit' => '^12.0',
         'psr/container' => '^2.0',
@@ -631,6 +641,10 @@ ENV;
             $this->requirePackages(self::CYCLE_PACKAGES);
         }
 
+        if ($cqrs && $cycle) {
+            $this->requirePackages(self::CQRS_CYCLE_PACKAGES);
+        }
+
         if ($websocket) {
             $this->requirePackages(self::WEBSOCKET_PACKAGES);
         }
@@ -699,6 +713,7 @@ ENV;
 
         $this->composerFile->write($this->definition);
         $this->syncComposerPackage();
+        $this->syncComposerLocker();
         $this->io->write('<info>Componenta skeleton installed.</info>');
     }
 
@@ -730,6 +745,24 @@ ENV;
         $package->setScripts($this->definition['scripts'] ?? []);
         $package->setConfig($this->definition['config'] ?? []);
         $package->setExtra($this->definition['extra'] ?? []);
+    }
+
+    private function syncComposerLocker(): void
+    {
+        $contents = file_get_contents($this->composerFile->getPath());
+
+        if ($contents === false) {
+            throw new RuntimeException(
+                'Unable to read composer.json after writing the selected preset.',
+            );
+        }
+
+        $this->composer->setLocker(new Locker(
+            $this->io,
+            $this->composer->getLocker()->getJsonFile(),
+            $this->composer->getInstallationManager(),
+            $contents,
+        ));
     }
 
     private function removeInstallerClassmapEntry(): void
@@ -805,6 +838,7 @@ ENV;
             self::POLICY_PACKAGES,
             self::AUTH_PACKAGES,
             self::CYCLE_PACKAGES,
+            self::CQRS_CYCLE_PACKAGES,
             self::TEMPLATE_PACKAGES,
             self::WEBSOCKET_PACKAGES,
             self::LEGACY_OPTIONAL_PACKAGES,
