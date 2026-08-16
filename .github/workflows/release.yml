@@ -25,58 +25,39 @@ jobs:
           tools: composer:v2
       - run: composer validate --strict
       - run: php -l installer/Installer.php
-      - run: composer update --no-interaction --prefer-dist --no-scripts
-      - name: Verify installed release versions and installer floors
-        shell: bash
-        run: |
-          set -euo pipefail
-          python <<'PY'
-          import json
-          import subprocess
-          from pathlib import Path
-
-          data = json.loads(subprocess.check_output([
-              'composer', 'show', '--direct', '--format=json'
-          ]))
-          installed = {
-              package['name']: package['version'].lstrip('v')
-              for package in data['installed']
-          }
-          expected = {
-              'componenta/app': '3.0.2',
-              'componenta/app-console': '3.0.2',
-              'componenta/config': '2.0.2',
-              'componenta/di': '4.0.2',
-              'componenta/validation': '2.0.0',
-              'componenta/validation-app': '1.0.0',
-          }
-          for package, version in expected.items():
-              actual = installed.get(package)
-              if actual != version:
-                  raise SystemExit(f'{package}: expected {version}, got {actual}')
-
-          installer = Path('installer/Installer.php').read_text()
-          required = {
-              "'componenta/app' => '^3.0.2'",
-              "'componenta/app-console' => '^3.0.2'",
-              "'componenta/config' => '^2.0.2'",
-              "'componenta/cqrs-app' => '^3.0.2'",
-              "'componenta/di' => '^4.0.2'",
-              "'componenta/validation' => '^2.0.0'",
-              "'componenta/validation-app' => '^1.0.0'",
-          }
-          missing = sorted(item for item in required if item not in installer)
-          if missing:
-              raise SystemExit('Missing installer floors: ' + ', '.join(missing))
-          PY
-      - name: Run the skeleton installer non-interactively
+      - run: php -l installer/verify-dependencies.php
+      - name: Resolve root package graph from Packagist
+        run: composer update --no-interaction --prefer-dist --no-scripts --no-progress
+      - name: Show resolved validation integration package
+        run: composer show componenta/validation-app --format=json
+      - name: Verify dependency floors and every preset graph
+        run: php installer/verify-dependencies.php
+      - name: Run the default installer preset non-interactively
         shell: bash
         run: |
           set -euo pipefail
           composer run-script post-root-package-install --no-interaction
-          composer update --no-interaction --prefer-dist --no-scripts
+          composer update --no-interaction --prefer-dist --no-scripts --no-progress
           test -d tests
           test -f tests/SmokeTest.php
+          test ! -d installer
+          python <<'PY'
+          import json
+          from pathlib import Path
+
+          composer = json.loads(Path('composer.json').read_text())
+          if composer.get('repositories'):
+              raise SystemExit('Generated project must not contain custom Composer repositories.')
+          if 'installer/Installer.php' in composer.get('autoload', {}).get('classmap', []):
+              raise SystemExit('Installer classmap entry was not removed.')
+          for script in (
+              'post-root-package-install',
+              'post-create-project-cmd',
+              'post-install-cmd',
+          ):
+              if script in composer.get('scripts', {}):
+                  raise SystemExit(f'Installer lifecycle script remains: {script}')
+          PY
           composer validate --strict
       - run: composer test
 
