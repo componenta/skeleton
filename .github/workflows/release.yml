@@ -69,6 +69,15 @@ jobs:
           if missing:
               raise SystemExit('Missing installer floors: ' + ', '.join(missing))
           PY
+      - name: Run the skeleton installer non-interactively
+        shell: bash
+        run: |
+          set -euo pipefail
+          composer run-script post-root-package-install --no-interaction
+          composer update --no-interaction --prefer-dist --no-scripts
+          test -d tests
+          test -f tests/SmokeTest.php
+          composer validate --strict
       - run: composer test
 
   publish:
