@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   sync:
-    if: github.event.head_commit.message == 'Sync skeleton dependency floors'
+    if: github.event.head_commit.message == 'Apply skeleton dependency sync'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -19,7 +19,7 @@ jobs:
           php-version: '8.5'
           coverage: none
           tools: composer:v2
-      - name: Update installer dependency floors
+      - name: Synchronize Installer package floors
         shell: bash
         run: |
           set -euo pipefail
@@ -63,197 +63,24 @@ jobs:
 
           path.write_text(source)
           PY
-      - name: Update release verification
-        shell: bash
-        run: |
-          cat > .github/workflows/release.yml <<'YAML'
-          name: Release
-
-          on:
-            push:
-              branches:
-                - main
-
-          permissions:
-            contents: read
-
-          jobs:
-            verify:
-              if: startsWith(github.event.head_commit.message, 'Release v')
-              runs-on: ubuntu-latest
-              strategy:
-                fail-fast: false
-                matrix:
-                  php: ['8.4', '8.5']
-              steps:
-                - uses: actions/checkout@v7
-                - uses: shivammathur/setup-php@v2
-                  with:
-                    php-version: ${{ matrix.php }}
-                    coverage: none
-                    tools: composer:v2
-                - run: composer validate --strict
-                - run: php -l installer/Installer.php
-                - run: composer update --no-interaction --prefer-dist --no-scripts
-                - name: Verify root dependency versions and installer floors
-                  shell: bash
-                  run: |
-                    set -euo pipefail
-                    python <<'PY'
-                    import json
-                    import subprocess
-                    from pathlib import Path
-
-                    data = json.loads(subprocess.check_output([
-                        'composer', 'show', '--format=json'
-                    ]))
-                    installed = {
-                        package['name']: package['version'].lstrip('v')
-                        for package in data['installed']
-                    }
-                    expected = {
-                        'componenta/app': '3.0.2',
-                        'componenta/app-console': '3.0.3',
-                        'componenta/app-http': '2.0.1',
-                        'componenta/config': '2.0.2',
-                        'componenta/di': '4.0.2',
-                        'componenta/error-handler': '1.0.2',
-                        'componenta/error-handler-app': '1.0.5',
-                        'componenta/http-body-parsing-middleware': '1.0.2',
-                        'componenta/http-emitter': '1.0.2',
-                        'componenta/http-psr': '1.0.2',
-                        'componenta/http-psr-nyholm': '1.0.2',
-                        'componenta/http-responder': '1.0.2',
-                        'componenta/interceptor': '2.0.1',
-                        'componenta/interceptor-app': '1.0.6',
-                        'componenta/middleware-factory': '2.0.1',
-                        'componenta/pipeline': '1.0.1',
-                        'componenta/router': '2.0.1',
-                        'componenta/router-app': '3.0.1',
-                        'componenta/templater-app': '1.0.5',
-                        'componenta/validation': '2.0.0',
-                        'componenta/validation-app': '1.0.1',
-                    }
-                    for package, version in expected.items():
-                        actual = installed.get(package)
-                        if actual != version:
-                            raise SystemExit(f'{package}: expected {version}, got {actual}')
-
-                    installer = Path('installer/Installer.php').read_text()
-                    required = {
-                        "'componenta/app' => '^3.0.2'",
-                        "'componenta/app-console' => '^3.0.3'",
-                        "'componenta/app-http' => '^2.0.1'",
-                        "'componenta/auth' => '^2.0.2'",
-                        "'componenta/config' => '^2.0.2'",
-                        "'componenta/cqrs-app' => '^3.0.3'",
-                        "'componenta/cqrs-policy' => '^2.0.2'",
-                        "'componenta/cqrs-transaction-cycle' => '^2.0.2'",
-                        "'componenta/clock' => '^1.0.1'",
-                        "'componenta/cycle-app' => '^1.0.7'",
-                        "'componenta/di' => '^4.0.2'",
-                        "'componenta/error-handler-app' => '^1.0.5'",
-                        "'componenta/http-body-parsing-middleware' => '^1.0.2'",
-                        "'componenta/http-psr' => '^1.0.2'",
-                        "'componenta/http-psr-nyholm' => '^1.0.2'",
-                        "'componenta/http-psr-diactoros' => '^1.0.2'",
-                        "'componenta/http-psr-guzzle' => '^1.0.2'",
-                        "'componenta/http-psr-slim' => '^1.0.2'",
-                        "'componenta/interceptor' => '^2.0.1'",
-                        "'componenta/interceptor-app' => '^1.0.6'",
-                        "'componenta/policy' => '^1.0.6'",
-                        "'componenta/policy-app' => '^1.0.6'",
-                        "'componenta/router' => '^2.0.1'",
-                        "'componenta/router-app' => '^3.0.1'",
-                        "'componenta/templater-app' => '^1.0.5'",
-                        "'componenta/validation' => '^2.0.0'",
-                        "'componenta/validation-app' => '^1.0.1'",
-                        "'componenta/websocket-app' => '^1.0.3'",
-                    }
-                    missing = sorted(item for item in required if item not in installer)
-                    if missing:
-                        raise SystemExit('Missing installer floors: ' + ', '.join(missing))
-                    PY
-                - name: Run the skeleton installer non-interactively
-                  shell: bash
-                  run: |
-                    set -euo pipefail
-                    composer run-script post-root-package-install --no-interaction
-                    composer update --no-interaction --prefer-dist --no-scripts
-                    test -d tests
-                    test -f tests/SmokeTest.php
-                    composer validate --strict
-                - name: Verify installed default preset stack
-                  shell: bash
-                  run: |
-                    set -euo pipefail
-                    python <<'PY'
-                    import json
-                    import subprocess
-
-                    data = json.loads(subprocess.check_output([
-                        'composer', 'show', '--format=json'
-                    ]))
-                    installed = {
-                        package['name']: package['version'].lstrip('v')
-                        for package in data['installed']
-                    }
-                    expected = {
-                        'componenta/app-console': '3.0.3',
-                        'componenta/app-http': '2.0.1',
-                        'componenta/cqrs': '3.0.3',
-                        'componenta/cqrs-app': '3.0.3',
-                        'componenta/cqrs-policy': '2.0.2',
-                        'componenta/policy': '1.0.6',
-                        'componenta/policy-app': '1.0.6',
-                        'componenta/router': '2.0.1',
-                        'componenta/router-app': '3.0.1',
-                        'componenta/validation': '2.0.0',
-                        'componenta/validation-app': '1.0.1',
-                    }
-                    for package, version in expected.items():
-                        actual = installed.get(package)
-                        if actual != version:
-                            raise SystemExit(f'{package}: expected {version}, got {actual}')
-                    PY
-                - run: composer test
-
-            publish:
-              if: startsWith(github.event.head_commit.message, 'Release v')
-              needs: verify
-              runs-on: ubuntu-latest
-              permissions:
-                contents: write
-              steps:
-                - uses: actions/checkout@v7
-                - name: Publish GitHub release
-                  shell: bash
-                  env:
-                    GH_TOKEN: ${{ github.token }}
-                    COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-                  run: |
-                    set -euo pipefail
-                    first_line="${COMMIT_MESSAGE%%$'\n'*}"
-                    tag="${first_line#Release }"
-                    if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
-                      echo "Invalid release tag: $tag" >&2
-                      exit 1
-                    fi
-                    if gh release view "$tag" >/dev/null 2>&1; then
-                      echo "Release $tag already exists."
-                      exit 0
-                    fi
-                    gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --generate-notes
-          YAML
       - run: composer validate --strict
       - run: php -l installer/Installer.php
-      - name: Commit release
+      - run: php -l installer/verify-dependencies.php
+      - name: Prove Packagist-only root and preset resolution
+        shell: bash
+        run: |
+          set -euo pipefail
+          composer update --no-interaction --prefer-dist --no-scripts --no-progress
+          composer show componenta/validation-app --format=json
+          php installer/verify-dependencies.php
+      - name: Commit synchronized installer and remove one-shot workflow
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add installer/Installer.php .github/workflows/release.yml
+          git rm .github/workflows/sync-dependency-floors.yml
+          git add installer/Installer.php
           git diff --cached --check
-          git commit -m 'Release v3.1.1'
+          git commit -m 'Synchronize skeleton dependency floors'
           git push
