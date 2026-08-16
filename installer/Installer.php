@@ -98,6 +98,8 @@ final class Installer
         'componenta/di',
         'componenta/error-handler-app',
         'componenta/path-resolver',
+        'componenta/validation',
+        'componenta/validation-app',
     ];
 
     private const array HTTP_PACKAGES = [
@@ -147,7 +149,6 @@ final class Installer
         'componenta/identity',
         'componenta/session',
         'componenta/uuid',
-        'componenta/validation',
         'psr/clock',
         'psr/http-message',
         'psr/http-server-middleware',
@@ -161,18 +162,20 @@ APP_DEBUG=true
 ENV;
 
     private const array PACKAGE_VERSIONS = [
-        'componenta/app' => '^3.0.1',
-        'componenta/app-console' => '^3.0.1',
+        'componenta/app' => '^3.0.2',
+        'componenta/app-console' => '^3.0.2',
         'componenta/app-http' => '^2.0',
         'componenta/auth' => '^2.0.1',
         'componenta/composer-plugin' => '^1.0.2',
-        'componenta/config' => '^2.0.1',
-        'componenta/cqrs-app' => '^3.0.1',
+        'componenta/config' => '^2.0.2',
+        'componenta/cqrs-app' => '^3.0.2',
         'componenta/cqrs-policy' => '^2.0.1',
         'componenta/cqrs-transaction-cycle' => '^2.0.1',
         'componenta/clock' => '^1.0',
         'componenta/cycle-app' => '^1.0.6',
-        'componenta/di' => '^4.0.1',
+        'componenta/di' => '^4.0.2',
+        'componenta/validation' => '^2.0.0',
+        'componenta/validation-app' => '^1.0.0',
         'componenta/error-handler-app' => '^1.0.4',
         'componenta/http' => '^1.0',
         'componenta/http-body-parsing-middleware' => '^1.0.1',
