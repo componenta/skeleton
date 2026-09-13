@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Componenta\App\Config\ConfigFactory;
-use Componenta\App\ContainerFactory;
+use Componenta\DI\ContainerFactory;
 use Componenta\Stdlib\PathResolverInterface;
 
 if (!isset($paths) || !$paths instanceof PathResolverInterface) {
@@ -15,4 +15,7 @@ $result = ConfigFactory::create(
     definition: static fn () => require $paths->resolve('config/config.php'),
 );
 
-return ContainerFactory::create($paths, $result->config, $result->discovered);
+return (new ContainerFactory())->create(
+    $result->composition->config,
+    $result->composition->dependencies,
+)->container;

@@ -32,6 +32,8 @@ jobs:
         run: composer show componenta/validation-app --format=json
       - name: Verify dependency floors and every preset graph
         run: php installer/verify-dependencies.php
+      - name: Verify application bootstrap and lazy build
+        run: vendor/bin/phpunit installer/tests
       - name: Run the default installer preset non-interactively
         shell: bash
         run: |
