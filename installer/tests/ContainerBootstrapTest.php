@@ -15,6 +15,29 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 final class ContainerBootstrapTest extends TestCase
 {
+    public function testDefaultFileProvidersLoadSupportedFormats(): void
+    {
+        $root = sys_get_temp_dir() . '/skeleton_formats_' . bin2hex(random_bytes(8));
+        mkdir($root . '/config/autoload', 0700, true);
+        mkdir($root . '/src');
+        foreach (['config.php', 'container.php', 'console.php'] as $file) {
+            copy(dirname(__DIR__, 2) . '/config/' . $file, $root . '/config/' . $file);
+        }
+        file_put_contents($root . '/config/componenta-providers.php', '<?php return [];');
+        file_put_contents($root . '/config/autoload/app.global.php', '<?php return ["feature" => ["first" => "php"]];');
+        file_put_contents($root . '/config/autoload/app.local.json', '{"feature":{"second":"json"}}');
+        file_put_contents($root . '/config/autoload/notes.local.yaml', 'This unsupported format is outside the default configuration inputs.');
+        try {
+            $paths = new PathResolver($root);
+            $container = require $root . '/config/container.php';
+            self::assertSame(['first' => 'php', 'second' => 'json'], $container->get(Config::class)->get('feature'));
+        } finally {
+            $entries = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($entries as $entry) { $entry->isDir() ? rmdir($entry->getPathname()) : unlink($entry->getPathname()); }
+            rmdir($root);
+        }
+    }
+
     public function testGeneratedBootstrapUsesOneContainerAndKeepsBuildLazy(): void
     {
         $root = sys_get_temp_dir() . '/skeleton_bootstrap_' . bin2hex(random_bytes(8));
@@ -50,11 +73,13 @@ final class ContainerBootstrapTest extends TestCase
             self::assertSame(1, SkeletonBuildProvider::$creations);
             self::assertSame('built', file_get_contents($root . '/built.txt'));
         } finally {
-            foreach (['config/config.php', 'config/container.php', 'config/console.php', 'config/componenta-providers.php', 'built.txt'] as $file) {
-                if (is_file($root . '/' . $file)) { unlink($root . '/' . $file); }
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST,
+            );
+            foreach ($files as $file) {
+                $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
             }
-            rmdir($root . '/config');
-            rmdir($root . '/src');
             rmdir($root);
         }
     }

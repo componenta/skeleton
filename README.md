@@ -40,6 +40,14 @@ php bin/console.php app:build
 
 This ordinary console command uses the existing container. Builders are created only when it executes; list and help keep build dependencies lazy.
 
+When discovery is configured, the build writes `var/cache/build/classes.php` with ordered declarations and the metadata needed to reconstruct `ClassInfo`. Subsequent startups use this list without traversing directories or tokenizing source files. `AttributeConfigProvider` consumes the prepared iterator and continues registering configuration providers normally. Build leaves configuration files and `FileProvider` registrations unchanged.
+
+App also builds `boot.php` with boot method names, and App Console builds `commands.php` with command attribute membership. Their runtime factories use these maps with prepared discovery while preserving native attribute instantiation. Missing or malformed metadata maps use the original reflection path.
+
+The map remains active until rebuilt or deleted, independently of `APP_ENV`. All commands use ordinary bootstrap with available maps. `app:build` runs the registered builders; `app:clean` calls the optional `ApplicationBuildCleanerInterface::clean()` on the same builders. The entrypoint does not inspect command names or remove maps. List, help and version requests preserve artifacts.
+
+Run `php bin/console.php app:clean` and then `php bin/console.php app:build` as separate processes to rebuild with fresh configuration discovery. Cleaning removes only registered builders' artifacts, preserves unrelated files, and succeeds when artifacts are already absent. The next application process uses source discovery until another build creates the maps. There is no development discovery cache or file freshness check. Builders share fresh source discovery through DI.
+
 Packages and applications register an ordered service list under `Componenta\App\ConfigKey::BUILDERS`. Each builder implements `ApplicationBuilderInterface::build(): void` and receives dependencies through its constructor. Each builder writes its own artifact atomically. A failure stops the sequence and preserves artifacts already written by earlier builders.
 
 Installed integrations can generate CQRS, route, interceptor and validation maps. Runtime factories select optimized implementations and supported source fallback. Custom providers and native attribute behavior are preserved. Validation uses its attribute provider for classes whose rules cannot be exported. Policy uses its normal provider and memory cache.

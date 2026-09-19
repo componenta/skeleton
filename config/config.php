@@ -18,7 +18,7 @@ return new ConfigDefinition(
         new ComposerPackageConfigProvider($paths->resolve('config/componenta-providers.php')),
         new AttributeConfigProvider(),
         new FileProvider($paths->resolve('config/console.php')),
-        new FileProvider($paths->resolve('config/autoload/{{,*.}global,{,*.}local}.{php,yaml,json}')),
+        new FileProvider($paths->resolve('config/autoload/{{,*.}global,{,*.}local}.{php,json}')),
     ],
     discovery: new DiscoveryDefinition(
         directories: ['src'],

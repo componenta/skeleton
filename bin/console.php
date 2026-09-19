@@ -18,7 +18,8 @@ set_error_handler(static function (int $errno, string $message, string $file, in
 try {
     require $root . '/vendor/autoload.php';
 
-    run(Scope::CLI, new PathResolver($root));
+    $paths = new PathResolver($root);
+    run(Scope::CLI, $paths);
 } catch (Throwable $e) {
     ini_set('error_log', $root . '/log/error.log');
     error_log((string) $e);
