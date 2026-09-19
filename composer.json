@@ -13,25 +13,25 @@
         "psr-15"
     ],
     "require": {
-        "componenta/app": "^4.0.0",
-        "componenta/app-console": "^4.0.0",
-        "componenta/app-http": "^2.1.0",
+        "componenta/app": "^5.0.0",
+        "componenta/app-console": "^5.0.0",
+        "componenta/app-http": "^3.0.0",
         "componenta/composer-plugin": "^1.0.3",
         "componenta/config": "^3.0.0",
-        "componenta/di": "^5.0.0",
-        "componenta/error-handler-app": "^1.1.0",
+        "componenta/di": "^5.0.3",
+        "componenta/error-handler-app": "^1.2.0",
         "componenta/http": "^1.0",
         "componenta/http-body-parsing-middleware": "^1.1.0",
         "componenta/http-psr": "^1.1.0",
         "componenta/http-psr-nyholm": "^1.1.0",
         "componenta/interceptor": "^3.0.0",
-        "componenta/interceptor-app": "^2.0.0",
+        "componenta/interceptor-app": "^3.0.0",
         "componenta/path-resolver": "^1.0",
-        "componenta/router": "^2.1.0",
-        "componenta/router-app": "^4.0.0",
-        "componenta/templater-app": "^1.1.0",
-        "componenta/validation": "^3.0.0",
-        "componenta/validation-app": "^2.0.0",
+        "componenta/router": "^3.0.0",
+        "componenta/router-app": "^5.0.0",
+        "componenta/templater-app": "^1.2.0",
+        "componenta/validation": "^3.0.1",
+        "componenta/validation-app": "^3.0.0",
         "ext-ctype": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
@@ -77,7 +77,7 @@
             "config-providers-file": "config/componenta-providers.php"
         },
         "branch-alias": {
-            "dev-main": "4.0.x-dev"
+            "dev-main": "5.0.x-dev"
         }
     },
     "minimum-stability": "stable",
