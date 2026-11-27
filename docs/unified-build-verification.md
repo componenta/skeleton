@@ -4,7 +4,7 @@ The implementation was exercised on PHP 8.5.13 with Composer 2.11.3, using an is
 
 ## Executed checks
 
-- 20 suites: **852 tests, 3,868 assertions, no skipped tests, no failures or errors**.
+- 22 suites: **1,578 test cases, 63,541 assertions, 12 version-dependent skips, no failures or errors**. The skips and deliberate warning events are explained below.
 - The existing CQRS integration suite is retained: transport, policy, retry, locking and SQLite transactions in source and prepared modes.
 - CQRS App PHPStan runs at the repository's existing maximum level.
 - The real Skeleton installer generates Web, API and CLI projects. Their complete runtime/dev constraints resolve to 122, 119 and 102 packages respectively.
@@ -18,13 +18,17 @@ The tests verify fresh source configuration before building, discovery of a newl
 
 Publication tests cover late builder failure, unsupported optional optimization, empty artifacts, duplicate IDs, closed contexts, retained worker snapshots, repeated cleanup, release identity mismatch and required-artifact policy. A two-process regression verifies that the JSON publication pointer stays current with `opcache.validate_timestamps=0`, while an already selected generation remains pinned.
 
-Required-artifact policy is copied independently of caller-owned PHP references, including the policy retained by an already selected generation. A subprocess with a restricted OPcache API verifies successful publication, cleanup and republication after completed filesystem operations. Cleanup resolves only the build directory: malformed dotenv content cannot prevent unpublishing, and existing workers retain their selected generation.
+Required-artifact policy is copied independently of caller-owned PHP references, including the policy retained by an already selected generation. Bootstrap captures its required-provider validation before invoking a definition loader that can change those references. A subprocess with a restricted OPcache API verifies successful publication, cleanup and republication after completed filesystem operations. Cleanup resolves only the build directory: malformed dotenv content cannot prevent unpublishing, and existing workers retain their selected generation.
+
+Relative store directories are bound to their original working directory without changing native `symlink/..` lookup. Absolute stores still work when the caller's working directory is unavailable. A selected reader retains its physical generation after a deployment alias switches to another release, while new loads and cleanup follow the current alias. Separate subprocess coverage verifies optional fallback and required-policy errors under `open_basedir`, without leaking filesystem warnings or replacing the caller's error handler. Filesystem roots such as `/` and `C:/` remain absolute in PathResolver.
 
 Publication format 2 isolates internal metadata from valid artifact names, including `manifest`. Tests cover that name as both optional and required data across publication and rebuild. Write contexts cannot be cloned or serialized into a second capability that outlives the original build. Older publication formats require rebuilding; optional runtime falls back to source and required-artifact policy rejects them.
 
 Router, CQRS and validation tests preserve their existing ordering and runtime semantics. Unsupported validation DTOs use their native provider and create fresh rules. Optional Cycle preparation reads database metadata only when enabled; a real SQLite table and sentinel row remain unchanged after schema preparation.
 
-The Router source pin includes the latest collection-variable validation, caller-reference isolation and extended-character-class lexer fixes. Separate upstream checks pass 36 tests with 90 assertions, and source/prepared adapter probes agree. The local PCRE version is 10.44: 12 separate upstream matching cases requiring PCRE 10.45 are skipped and are not included in the 20-suite totals above. Lexer probes cover their boundaries, but do not establish matching behavior on PCRE 10.45.
+The complete Router suite is part of the central gate. It includes source/prepared generation syntax, PCRE option scope, standalone publication with a restricted OPcache API, and optional responder resolution through DI 6. PSR response, middleware and request-handler results bypass responder construction; normalization uses the application's responder and preserves its failures. Router cache schema 20 is exercised through RouterApp, including optional fallback and required-schema rejection for older maps.
+
+The local PCRE version is 10.44: 12 Router matching cases requiring PCRE 10.45 are skipped and included in the reported totals. Their execution on newer PCRE is not claimed by this local report. Four additional Pest warning events come from deliberate invalid-PCRE fixtures: PHP marks them as suppressed, the tests verify the expected router exception and error-handler restoration, and reporting has not been disabled.
 
 Compatibility-only changes to HTTP PSR adapters and the CQRS policy/transport/transaction packages retain their production PHP implementations and previous supported dependency ranges. Tests exercise the added Config 4 / DI 6 / CQRS 5 paths. Body parsing already supported Config 4 on its selected audit branch and required no new source change.
 
