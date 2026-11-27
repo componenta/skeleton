@@ -1,6 +1,6 @@
 # Componenta Skeleton
 
-Starter project for PHP 8.4+ with HTTP, CLI and WebSocket presets.
+Starter project for PHP 8.5.13+ with HTTP, CLI and WebSocket presets.
 
 ## Install
 
@@ -22,9 +22,11 @@ The installer selects dependencies, creates entry points and a local `.env`, the
 
 HTTP presets support Nyholm, Diactoros, Guzzle and Slim. Interactive setup also selects Pest or PHPUnit and optional integrations. Full uses Nyholm, Plates and Pest. WebSocket can be added to another preset.
 
+**Verified on this branch:** generated Web, API and CLI projects. Full/Auth and WebSocket still need their separate dependency/API migrations; see [preset compatibility](docs/preset-compatibility.md).
+
 ## Configuration and lifecycle
 
-Entry points load Composer and call `Componenta\App\run()` with a scope and `PathResolver`. The application loads `config/container.php`.
+Entry points load Composer. The CLI first dispatches build operations through `BuildConsole`; ordinary commands and other scopes call `Componenta\App\run()` with a scope and `PathResolver`. The application loads `config/container.php`.
 
 `config/config.php` returns a `ConfigDefinition` with providers, configuration files and optional discovery directories. `Componenta\App\Config\ConfigFactory` produces a composition containing runtime Config and separate dependency definitions. `Componenta\DI\ContainerFactory` receives these objects and creates the container. Factories receive `ContainerValue` and access the same Config through `$container->config`.
 
@@ -34,25 +36,42 @@ Configuration is composed in every environment. The configured class source is s
 
 ## Build and deployment
 
-```bash
-php bin/console.php app:build
-```
+Preparation is optional. Source mode remains a complete runtime mode, including in production. `APP_ENV` selects application configuration; it neither creates artifacts nor proves that a build exists.
 
-This ordinary console command uses the existing container. Builders are created only when it executes; list and help keep build dependencies lazy.
+~~~bash
+composer install --no-dev --optimize-autoloader
+APP_BUILD_ID="release-2026-11-27" php bin/console.php app:build
+~~~
 
-When discovery is configured, the build writes `var/cache/build/classes.php` with ordered declarations and the metadata needed to reconstruct `ClassInfo`. Subsequent startups use this list without traversing directories or tokenizing source files. `AttributeConfigProvider` consumes the prepared iterator and continues registering configuration providers normally. Build leaves configuration files and `FileProvider` registrations unchanged.
+Use the same `APP_BUILD_ID` in the deployed runtime. It identifies the immutable code release and structural configuration profile; use different IDs when those inputs differ. Without an ID, the deployment must keep code and build artifacts together and rebuild after every structural change. Runtime does not recursively hash source files or rebuild missing artifacts.
 
-App also builds `boot.php` with boot method names, and App Console builds `commands.php` with command attribute membership. Their runtime factories use these maps with prepared discovery while preserving native attribute instantiation. Missing or malformed metadata maps use the original reflection path.
+The CLI entry point calls `BuildConsole` immediately after autoloading, before ordinary container creation and runtime bootloaders. Use the full deployment command names `app:build` and `app:clean`. Build composes current source configuration in a fresh container, so a newly added `#[AsConfig]` provider or a removed declaration is handled on the first rebuild. No preliminary clean is needed. Provider code still executes to define the build; the complete Config object and live services are not snapshotted. Domain artifacts may include structural configuration such as handler registrations; this is part of the release/profile identity.
 
-The map remains active until rebuilt or deleted, independently of `APP_ENV`. All commands use ordinary bootstrap with available maps. `app:build` runs the registered builders; `app:clean` calls the optional `ApplicationBuildCleanerInterface::clean()` on the same builders. The entrypoint does not inspect command names or remove maps. List, help and version requests preserve artifacts.
+Each builder writes through `ApplicationBuilderInterface::build(BuildContext $build): void`. App places all outputs in a new `var/cache/build/generations/<generation>/` directory, writes its manifest, and replaces `current.json` only after every builder succeeds. A failure leaves the previous generation published. Unsupported optional optimizations are explicitly recorded and use source at runtime; actual compilation failures stop the build.
 
-Run `php bin/console.php app:clean` and then `php bin/console.php app:build` as separate processes to rebuild with fresh configuration discovery. Cleaning removes only registered builders' artifacts, preserves unrelated files, and succeeds when artifacts are already absent. The next application process uses source discovery until another build creates the maps. There is no development discovery cache or file freshness check. Builders share fresh source discovery through DI.
+| Artifact | Prepared information | Work that remains at runtime |
+|---|---|---|
+| `app.discovery` | Ordered class declarations | Loading classes when needed |
+| `app.config-providers` | Ordered `#[AsConfig]` provider class names | Provider construction, invocation and configuration composition |
+| `app.boot` | Boot method membership | Attribute instances, DI arguments and boot calls |
+| `console.commands` | Command attribute membership | Command construction and registration |
+| `router.routes` | Router's portable compiled route schema | Request matching, DI and dynamic-context fallback |
+| `cqrs.maps` | Handler/listener descriptors and priorities | Dispatch and runtime callbacks |
+| `validation.rules` | Supported literal validation descriptions | Fresh rules/validators and unsupported DTO fallback |
 
-Packages and applications register an ordered service list under `Componenta\App\ConfigKey::BUILDERS`. Each builder implements `ApplicationBuilderInterface::build(): void` and receives dependencies through its constructor. Each builder writes its own artifact atomically. A failure stops the sequence and preserves artifacts already written by earlier builders.
+Cycle schema preparation is a separate explicit opt-in in Cycle App: schema compilation can read database metadata and must not synchronize tables or run migrations. Interceptor 4 uses its native runtime attribute cache and needs no separate build map; the Skeleton no longer installs the redundant Interceptor App adapter.
 
-Installed integrations can generate CQRS, route, interceptor and validation maps. Runtime factories select optimized implementations and supported source fallback. Custom providers and native attribute behavior are preserved. Validation uses its attribute provider for classes whose rules cannot be exported. Policy uses its normal provider and memory cache.
+A bootstrap pins one `PreparedBuild`. Rebuilding or cleaning does not switch artifacts under an existing worker. Restart workers when deploying new code. `app:clean` only unpublishes the current pointer, works without evaluating providers, and preserves generations that running processes may still use. Remove old generation directories only as part of offline release cleanup after those processes stop.
 
-Use `APP_ENV=production` when deploying. Startup does not require build artifacts and runtime never invokes builders. Build during deployment to enable optimization, then restart long-running workers after updating code and artifacts.
+Missing or incompatible optional artifacts fall back to source. To make selected optimizations a deployment requirement, pass explicit `requiredArtifacts` to `ApplicationBuildRunner::build()` and runtime `ConfigFactory::create()`, for example `['app.discovery', 'app.config-providers', 'app.boot', 'console.commands']`. An empty builder set and empty maps are valid. Required-artifact policy is independent of `APP_ENV`.
+
+### Migration from individual map files
+
+Custom builders must accept `BuildContext`, replace direct file writes with `$build->write('vendor.artifact', $payload, schemaVersion: 1)`, and report a deliberately unsupported optimization with `$build->skip('vendor.artifact', $reason)`. Unexpected exceptions must propagate. Constructor injection continues to provide source dependencies. Builders must not read outputs of other participants in the same run.
+
+Per-builder cleaners, output path/generation constructor arguments and independent `classes.php`, `boot.php`, `commands.php` readers are replaced by the shared protocol. Old files are ignored; a rebuild produces the new generation format. The optional runtime snapshot is addressed through `AppConfigKey::PREPARED_BUILD` rather than probing whether its concrete class can be autowired.
+
+This branch targets App/Console 6, Config 4, DI 6, Router 4 / Router App 6, CQRS 5 / CQRS App 6, Validation 3.2 / Validation App 4, Error Handler App 2 and optional Cycle App 3 on PHP 8.5.13+. The installer and root requirements use release constraints. These releases must be available together before publishing this Skeleton; development verification can use explicit branch checkouts in a separate integration project.
 
 ## Development
 

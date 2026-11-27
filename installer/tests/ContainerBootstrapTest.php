@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 use Componenta\App\Build\ApplicationBuilderInterface;
+use Componenta\App\Build\BuildContext;
+use Componenta\App\Build\BuildStore;
 use Componenta\App\Console\Command\BuildCommand;
 use Componenta\Config\Config;
 use Componenta\Config\ContainerValue;
@@ -71,7 +73,7 @@ final class ContainerBootstrapTest extends TestCase
             }
             self::assertSame(0, $application->run(new ArrayInput(['command' => 'app:build']), new BufferedOutput()));
             self::assertSame(1, SkeletonBuildProvider::$creations);
-            self::assertSame('built', file_get_contents($root . '/built.txt'));
+            self::assertSame(['value' => 'built'], (new BuildStore($root . '/var/cache/build'))->load()->read('fixture.bootstrap'));
         } finally {
             $files = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
@@ -101,7 +103,7 @@ final class SkeletonBuildProvider extends \Componenta\Config\ConfigProvider
             $paths = $container->get(PathResolverInterface::class, PathResolverInterface::class);
             return new class($paths) implements ApplicationBuilderInterface {
                 public function __construct(private PathResolverInterface $paths) {}
-                public function build(): void { file_put_contents($this->paths->resolve('built.txt'), 'built'); }
+                public function build(BuildContext $build): void { $build->write('fixture.bootstrap', ['value' => 'built']); }
             };
         }];
     }

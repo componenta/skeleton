@@ -1,0 +1,387 @@
+{
+    "format": 1,
+    "tools": {
+        "php": "^8.5.13",
+        "pestphp/pest": "^4.0",
+        "phpbench/phpbench": "^1.7",
+        "composer/composer": "^2.8",
+        "nyholm/psr7": "^1.8",
+        "psr/log": "^3.0"
+    },
+    "sources": {
+        "componenta/app": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "6.0.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml.dist",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/app-console": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "6.0.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml.dist",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/app-http": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "4.0.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml.dist",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/arrayable": {
+            "ref": "482acfddffa3b1b85e982d1bf4ab6c007d084a8a",
+            "version": "1.0.0"
+        },
+        "componenta/caster": {
+            "ref": "383455d00c5ab8a1067b4916e11d11dae7c4a58c",
+            "version": "1.0.0"
+        },
+        "componenta/class-finder": {
+            "ref": "59cfaaa19b9c9c1abaf14464a007dbe9754162b4",
+            "version": "2.2.0"
+        },
+        "componenta/clock": {
+            "ref": "522a039f56e8312160e1e62ed1ae58c6c558bbaf",
+            "version": "1.2.0"
+        },
+        "componenta/composer-plugin": {
+            "ref": "623489dda209d8a7f92184e101a8dace554ce617",
+            "version": "2.0.0"
+        },
+        "componenta/config": {
+            "ref": "4685e71d86500a7b51f4a773bb3022dd787fba7f",
+            "version": "4.0.0"
+        },
+        "componenta/cqrs": {
+            "ref": "9d3da0fcb8a0d59d9639d2c5da2adb942dc7953f",
+            "version": "5.0.0"
+        },
+        "componenta/cqrs-app": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "6.0.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/cqrs-lock": {
+            "ref": "fee280f680bbbe54d9d82510ac2b6996a74aee9c",
+            "version": "4.0.0"
+        },
+        "componenta/cqrs-policy": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "4.1.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/cqrs-retry": {
+            "ref": "7901a89cde08ac628493416a4bf5954337d797eb",
+            "version": "4.0.0"
+        },
+        "componenta/cqrs-transaction-cycle": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "3.1.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/cqrs-transport": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "5.1.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/cycle": {
+            "ref": "3312941deda16dc7b15eac86507ccc5e897936df",
+            "version": "2.0.0"
+        },
+        "componenta/cycle-app": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "3.0.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml.dist",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/di": {
+            "ref": "e203077d12048936f078d37d1cf3badd661e1716",
+            "version": "6.0.0"
+        },
+        "componenta/error-handler": {
+            "ref": "34e3ddddc8a896aed7377cc4033a88cf52659495",
+            "version": "2.0.0"
+        },
+        "componenta/error-handler-app": {
+            "ref": "e161eee57cda4c2a7862d6b3c80c1bf94f87ba9f",
+            "version": "2.0.0"
+        },
+        "componenta/filter": {
+            "ref": "92398eb3afb92933ae900d1798d67e32c9c98027",
+            "version": "2.1.0"
+        },
+        "componenta/http": {
+            "ref": "03911747caf3ea157ce4727f1bced7784eb295b5",
+            "version": "1.0.0"
+        },
+        "componenta/http-body-parsing-middleware": {
+            "ref": "efb1858ca6534068a228b9e7388c87a293c5e6b2",
+            "version": "1.2.0",
+            "test": {
+                "runner": "phpunit",
+                "args": [
+                    "--configuration=phpunit.xml.dist"
+                ]
+            }
+        },
+        "componenta/http-emitter": {
+            "ref": "dbdd5938824e6d781922c299afe29b216b22dbed",
+            "version": "2.0.0"
+        },
+        "componenta/http-psr": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "1.2.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml.dist",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/http-psr-diactoros": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "1.2.0",
+            "test": {
+                "runner": "phpunit",
+                "args": [
+                    "--no-configuration",
+                    "--bootstrap=vendor/autoload.php",
+                    "tests"
+                ]
+            }
+        },
+        "componenta/http-psr-guzzle": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "1.2.0",
+            "test": {
+                "runner": "phpunit",
+                "args": [
+                    "--no-configuration",
+                    "--bootstrap=vendor/autoload.php",
+                    "tests"
+                ]
+            }
+        },
+        "componenta/http-psr-nyholm": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "1.2.0",
+            "test": {
+                "runner": "phpunit",
+                "args": [
+                    "--no-configuration",
+                    "--bootstrap=vendor/autoload.php",
+                    "tests"
+                ]
+            }
+        },
+        "componenta/http-psr-slim": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "1.2.0",
+            "test": {
+                "runner": "phpunit",
+                "args": [
+                    "--no-configuration",
+                    "--bootstrap=vendor/autoload.php",
+                    "tests"
+                ]
+            }
+        },
+        "componenta/http-responder": {
+            "ref": "4f594970eeaa51f2b4690f71757e0db061b32d3b",
+            "version": "2.0.0"
+        },
+        "componenta/identity": {
+            "ref": "3feb94e0d64956ecdf7b22abed4a8bd9f597abeb",
+            "version": "1.1.1"
+        },
+        "componenta/interceptor": {
+            "ref": "418fb14551e3190b8e5e8595b52fcf82da4712e5",
+            "version": "4.0.0"
+        },
+        "componenta/interceptor-app": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "4.0.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml.dist",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/iterator": {
+            "ref": "2c444d7fa46ab1472968a1976d77676367f9e0b7",
+            "version": "1.1.2"
+        },
+        "componenta/middleware-factory": {
+            "ref": "26ceaa1c615f491023842c6cb8ebc41c8f60988e",
+            "version": "3.0.0"
+        },
+        "componenta/mimetype-detector": {
+            "ref": "8d5cfff9616ad46bd0530cb73a0452a239dcd94e",
+            "version": "2.0.0"
+        },
+        "componenta/paginator": {
+            "ref": "f2ce96465caec282e176ef29b2ad7cf665686af8",
+            "version": "1.0.0"
+        },
+        "componenta/path-resolver": {
+            "ref": "777965c7458cf35c071793ba076f2d12372d9656",
+            "version": "1.0.0"
+        },
+        "componenta/pipeline": {
+            "ref": "0a1dbf9983651800d734127bb7c3b9b8a50b5680",
+            "version": "1.1.1"
+        },
+        "componenta/policy": {
+            "ref": "49553032c7fb3a4d029405b94b6a713e612d8d56",
+            "version": "4.0.0"
+        },
+        "componenta/reflection": {
+            "ref": "f19a363e9e09a9d32f60c768f16e02fd8c93b631",
+            "version": "3.0.0"
+        },
+        "componenta/router": {
+            "ref": "71cd94432429a064f4a9e118787ca1efdf447c60",
+            "version": "4.0.0"
+        },
+        "componenta/router-app": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "6.0.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml.dist",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/scope": {
+            "ref": "b6d44926ee69adfd1bc83cfa989262197c2159c4",
+            "version": "1.0.0"
+        },
+        "componenta/skeleton": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "6.0.0",
+            "test": {
+                "runner": "phpunit",
+                "args": [
+                    "--no-configuration",
+                    "--bootstrap=vendor/autoload.php",
+                    "installer/tests"
+                ]
+            }
+        },
+        "componenta/templater": {
+            "ref": "d7f29865f3de63cd4f11a775100c185d5d889f91",
+            "version": "1.0.0"
+        },
+        "componenta/templater-app": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "1.3.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml.dist",
+                    "--compact"
+                ]
+            }
+        },
+        "componenta/tokenizer": {
+            "ref": "f8d267055ec5ebb33d125da280091b9629fb080e",
+            "version": "1.0.1"
+        },
+        "componenta/validation": {
+            "ref": "183f5481b8df327747fbab35e3088b5330aa3546",
+            "version": "3.2.0"
+        },
+        "componenta/validation-app": {
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "4.0.0",
+            "test": {
+                "runner": "phpunit",
+                "args": [
+                    "--configuration=phpunit.xml.dist"
+                ]
+            }
+        },
+        "componenta/var-export": {
+            "ref": "e72f1187061e65c2552d0915903a189df2889e9b",
+            "version": "2.0.0"
+        }
+    },
+    "extraSuites": [
+        {
+            "name": "cqrs-app-integration",
+            "project": "cqrs-app",
+            "directory": "integration",
+            "runner": "pest",
+            "args": [
+                "--configuration=phpunit.xml",
+                "--compact"
+            ]
+        }
+    ],
+    "presets": [
+        "web",
+        "api",
+        "cli"
+    ],
+    "checks": [
+        {
+            "name": "cqrs-app-phpstan",
+            "project": "cqrs-app",
+            "binary": "phpstan/phpstan/phpstan",
+            "args": [
+                "analyse",
+                "--configuration=phpstan.neon",
+                "--no-progress",
+                "--no-ansi"
+            ]
+        }
+    ]
+}

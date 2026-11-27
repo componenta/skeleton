@@ -295,7 +295,7 @@ function resolvePresetGraphs(array $versions, array $groups, array $integrationP
                 throw new RuntimeException(sprintf('Unable to create %s.', $workingDirectory));
             }
 
-            $requirements = ['php' => '^8.4'];
+            $requirements = ['php' => '^8.5.13'];
 
             foreach ($packages as $package) {
                 $constraint = $versions[$package] ?? null;

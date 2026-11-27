@@ -1,0 +1,69 @@
+name: Unified application build integration
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        description: Inventory repository whose source is under test
+        required: true
+        type: string
+      revision:
+        description: Exact caller commit or pull request merge commit
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: Optional inventory repository override
+        required: false
+        type: string
+      revision:
+        description: Revision for the optional repository override
+        required: false
+        type: string
+  push:
+    branches: [refactor/unified-application-build-2026-11-27]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out the central harness
+        uses: actions/checkout@v4
+        with:
+          repository: componenta/skeleton
+          ref: ${{ github.repository == 'componenta/skeleton' && github.sha || 'refactor/unified-application-build-2026-11-27' }}
+          persist-credentials: false
+      - name: Set up PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5.13'
+          extensions: ctype, curl, dom, fileinfo, mbstring, pdo_sqlite, xml, xmlreader, xmlwriter
+          coverage: none
+          tools: composer:v2
+      - name: Resolve sources and run integration suites
+        run: php integration/run.php
+        env:
+          COMPONENTA_REPOSITORY: ${{ inputs.repository || github.repository }}
+          COMPONENTA_REVISION: ${{ inputs.revision || github.sha }}
+      - name: Upload source locks, dependency locks and test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-build-integration
+          include-hidden-files: true
+          if-no-files-found: warn
+          path: |
+            integration/.work/*/source-lock.json
+            integration/.work/*/composer.json
+            integration/.work/*/composer.lock
+            integration/.work/*/report.json
+            integration/.work/*/logs/
+            integration/.work/*/presets/*/composer.generated.json
+            integration/.work/*/presets/*/composer.json
+            integration/.work/*/presets/*/composer.lock
