@@ -292,8 +292,15 @@
             "version": "3.0.0"
         },
         "componenta/router": {
-            "ref": "8dc7481f56341fb6064067caf25655b14384bb9a",
-            "version": "4.0.0"
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "4.0.0",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "--configuration=phpunit.xml",
+                    "--compact"
+                ]
+            }
         },
         "componenta/router-app": {
             "ref": "refactor/unified-application-build-2026-11-27",
