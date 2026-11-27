@@ -10,7 +10,10 @@ use function Componenta\App\run;
 $root = dirname(__DIR__);
 
 error_reporting(E_ALL);
-set_error_handler(static function (int $errno, string $message, string $file, int $line): never {
+set_error_handler(static function (int $errno, string $message, string $file, int $line): bool {
+    if ((error_reporting() & $errno) === 0) {
+        return false;
+    }
     throw new ErrorException($message, 0, $errno, $file, $line);
 });
 
