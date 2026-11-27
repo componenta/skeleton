@@ -15,6 +15,8 @@ The remote mode fetches public GitHub sources. A package workflow can override e
 
 Local mode copies tracked and nonignored untracked files from each named checkout. Locally deleted files stay deleted in the copy. Each snapshot records its commit, dirty file list, content digest and copied file count. A dirty snapshot cannot be reproduced from its Git commit alone. Input checkouts and their installed dependencies are never changed. Source symlinks that leave a checkout are rejected.
 
+Checkout directories may themselves be symlink aliases or linked Git worktrees. The runner resolves each input checkout before checking the workspace location and copying its files, so an alias cannot hide an input directory from these checks.
+
 Child processes discard inherited Composer manifest/vendor overrides, platform-ignore switches and Git work-tree overrides so they cannot redirect the gate to another project. Authentication, proxy, mirror and cache settings remain available. The generated Composer project explicitly keeps its vendor and binary directories inside the workspace.
 
 Each execution creates a new `integration/.work/<run>/` directory. An explicit `--work=/new/absolute/directory` is also supported. The directory must not already exist. The workspace contains copied sources, the generated Composer project, dependency lock, source lock, JSON report and individual command/JUnit logs. Keep the workspace if a local dirty snapshot needs to be inspected or rerun manually.

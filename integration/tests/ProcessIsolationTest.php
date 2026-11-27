@@ -85,6 +85,47 @@ final class ProcessIsolationTest extends TestCase
         self::assertSame(2, $metadata['files']);
     }
 
+    public function testWorkspaceCannotBeCreatedInsideACheckoutReachedThroughASourceAlias(): void
+    {
+        $source = $this->gitProject('actual-checkout', 'Original.php');
+        $aliases = $this->root . '/aliases';
+        mkdir($aliases);
+        symlink($source, $aliases . '/app');
+        $original = file_get_contents($source . '/Original.php');
+        $work = $source . '/unexpected-workspace';
+
+        $result = command([
+            PHP_BINARY, dirname(__DIR__) . '/run.php', '--sources=' . $aliases, '--work=' . $work,
+        ], $this->root, $this->root . '/workspace.log', false);
+
+        self::assertNotSame(0, $result['exitCode']);
+        self::assertStringContainsString('outside the input checkouts', $result['output']);
+        self::assertDirectoryDoesNotExist($work, $result['output']);
+        self::assertSame($original, file_get_contents($source . '/Original.php'));
+    }
+
+    public function testSourceAliasPreservesInternalRelativeLinksAndSnapshotIdentity(): void
+    {
+        $repository = $this->gitProject('repository', 'Original.php');
+        $source = $this->root . '/linked-worktree';
+        command([
+            'git', '-c', 'core.hooksPath=' . $this->root . '/empty-hooks',
+            'worktree', 'add', '--quiet', '--detach', $source, 'HEAD',
+        ], $repository, $this->root . '/worktree.log');
+        self::assertFileExists($source . '/.git');
+        symlink('Original.php', $source . '/InternalLink.php');
+        $alias = $this->root . '/source-alias';
+        symlink($source, $alias);
+
+        $direct = copySource($source, $this->root . '/direct-copy', $this->root . '/direct.log');
+        $aliased = copySource($alias, $this->root . '/aliased-copy', $this->root . '/aliased.log');
+
+        self::assertSame($direct['sha'], $aliased['sha']);
+        self::assertSame($direct['snapshotSha256'], $aliased['snapshotSha256']);
+        self::assertTrue(is_link($this->root . '/aliased-copy/InternalLink.php'));
+        self::assertSame(file_get_contents($source . '/Original.php'), file_get_contents($this->root . '/aliased-copy/InternalLink.php'));
+    }
+
     private function composerProject(string $name, array $require = []): string
     {
         $path = $this->root . '/' . $name;

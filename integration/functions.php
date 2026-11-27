@@ -93,6 +93,11 @@ function validRef(string $ref): bool
 /** Copy the working tree, including nonignored new files and excluding dependencies. */
 function copySource(string $source, string $destination, string $log): array
 {
+    $resolvedSource = realpath($source);
+    if ($resolvedSource === false) {
+        throw new RuntimeException('Local source directory does not exist: ' . $source);
+    }
+    $source = $resolvedSource;
     if (!is_dir($source . '/.git') && !is_file($source . '/.git')) {
         throw new RuntimeException('Local source is not a Git checkout: ' . $source);
     }

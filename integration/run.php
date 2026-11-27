@@ -41,9 +41,24 @@ try {
         throw new RuntimeException('Workspace paths must not contain parent-directory traversal.');
     }
     $work = canonicalNewPath($work);
-    if ($local !== null && str_starts_with($work, $local . '/')
-        && !str_starts_with($work, $local . '/skeleton/integration/.work/')) {
-        throw new RuntimeException('A local workspace must be outside the input checkouts or inside Skeleton integration/.work/.');
+    if ($local !== null) {
+        // A sources directory may contain aliases to checkouts elsewhere. Protect
+        // each physical input root before creating even the workspace log directory.
+        $sourceRoots = [$local];
+        foreach (array_keys($inventory['sources']) as $name) {
+            $root = realpath($local . '/' . substr($name, strlen('componenta/')));
+            if ($root !== false && is_dir($root)) {
+                $sourceRoots[] = $root;
+            }
+        }
+        $skeleton = realpath($local . '/skeleton');
+        $insideBuildWorkspace = $skeleton !== false && str_starts_with($work, $skeleton . '/integration/.work/');
+        foreach (array_unique($sourceRoots) as $root) {
+            if (str_starts_with($work, rtrim($root, '/') . '/')
+                && !($insideBuildWorkspace && ($root === $local || $root === $skeleton))) {
+                throw new RuntimeException('A local workspace must be outside the input checkouts or inside Skeleton integration/.work/.');
+            }
+        }
     }
     directory($work . '/logs');
     $workspaceCreated = true;
