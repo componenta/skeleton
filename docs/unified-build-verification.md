@@ -4,7 +4,7 @@ The implementation was exercised on PHP 8.5.13 with Composer 2.11.3, using an is
 
 ## Executed checks
 
-- 22 suites: **1,578 test cases, 63,541 assertions, 12 version-dependent skips, no failures or errors**. The skips and deliberate warning events are explained below.
+- 22 suites: **1,593 test cases, 63,742 assertions, 12 version-dependent skips, no failures or errors**. The skips and deliberate warning events are explained below.
 - The existing CQRS integration suite is retained: transport, policy, retry, locking and SQLite transactions in source and prepared modes.
 - CQRS App PHPStan runs at the repository's existing maximum level.
 - The real Skeleton installer generates Web, API and CLI projects. Their complete runtime/dev constraints resolve to 122, 119 and 102 packages respectively.
@@ -27,6 +27,10 @@ Publication format 2 isolates internal metadata from valid artifact names, inclu
 Router, CQRS and validation tests preserve their existing ordering and runtime semantics. Unsupported validation DTOs use their native provider and create fresh rules. Optional Cycle preparation reads database metadata only when enabled; a real SQLite table and sentinel row remain unchanged after schema preparation.
 
 The complete Router suite is part of the central gate. It includes source/prepared generation syntax, PCRE option scope, standalone publication with a restricted OPcache API, and optional responder resolution through DI 6. PSR response, middleware and request-handler results bypass responder construction; normalization uses the application's responder and preserves its failures. Router cache schema 20 is exercised through RouterApp, including optional fallback and required-schema rejection for older maps.
+
+RouterApp's intercepted resolver follows the same lazy responder contract. Real source and compiled routes cover PSR results, short-circuit callbacks, callback result transformation and repeated requests. A custom responder that is already lazy initializes only when normalization needs it; callback exceptions retain their identity and DI failures retain their original cause. RouteBuilder token/default inputs also detach caller-owned reference slots, including across builder clones, without deep-copying opaque values.
+
+Console bootloader tests verify that custom hosts cannot change accepted command membership through caller-owned PHP references after construction. The standard artifact reader and bootloader factory already return independent payloads; this regression concerns maps passed directly to the public constructor.
 
 The local PCRE version is 10.44: 12 Router matching cases requiring PCRE 10.45 are skipped and included in the reported totals. Their execution on newer PCRE is not claimed by this local report. Four additional Pest warning events come from deliberate invalid-PCRE fixtures: PHP marks them as suppressed, the tests verify the expected router exception and error-handler restoration, and reporting has not been disabled.
 
