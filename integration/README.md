@@ -11,6 +11,8 @@ PHP 8.5.13 or newer, Composer 2 and Git must be on `PATH`. SQLite, DOM, mbstring
 
 `sources.json` declares every Componenta library used by this gate, its source revision and its projected package version. Unchanged libraries use immutable commits. Packages being changed together use `refactor/unified-application-build-2026-11-27`; these are development sources, and the projected version is not a claim that a release has been published. Every run records the actual resolved commits in `source-lock.json` and the resolved dependency graph in `composer.lock`.
 
+For a revision newer than a published tag, the projected version identifies its next release according to the changes since that tag. It must not reuse the version of the earlier published code.
+
 The remote mode fetches public GitHub sources. A package workflow can override exactly one inventory entry with `COMPONENTA_REPOSITORY=componenta/package` and `COMPONENTA_REVISION=<commit>`. Both values are required together. They are passed directly as process arguments, never evaluated by a shell. The reusable workflow takes these values as `repository` and `revision` inputs.
 
 Local mode copies tracked and nonignored untracked files from each named checkout. Locally deleted files stay deleted in the copy. Each snapshot records its commit, dirty file list, content digest and copied file count. A dirty snapshot cannot be reproduced from its Git commit alone. Input checkouts and their installed dependencies are never changed. Source symlinks that leave a checkout are rejected.

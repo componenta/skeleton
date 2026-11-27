@@ -365,7 +365,7 @@
         },
         "componenta/var-export": {
             "ref": "e72f1187061e65c2552d0915903a189df2889e9b",
-            "version": "2.0.0"
+            "version": "2.0.1"
         }
     },
     "extraSuites": [
