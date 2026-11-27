@@ -270,8 +270,14 @@
             "version": "1.0.0"
         },
         "componenta/path-resolver": {
-            "ref": "777965c7458cf35c071793ba076f2d12372d9656",
-            "version": "1.0.0"
+            "ref": "refactor/unified-application-build-2026-11-27",
+            "version": "1.0.1",
+            "test": {
+                "runner": "pest",
+                "args": [
+                    "tests"
+                ]
+            }
         },
         "componenta/pipeline": {
             "ref": "0a1dbf9983651800d734127bb7c3b9b8a50b5680",
