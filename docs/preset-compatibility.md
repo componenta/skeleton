@@ -20,7 +20,7 @@ Web and API select Config 4, DI 6, CQRS App 6, CQRS Policy 4.1 and Policy 4. Pol
 Sources for these remaining constraints:
 
 - [Auth main manifest, f983a45](https://github.com/componenta/auth/blob/f983a4587013d74e99cc93597a6167047a8e761b/composer.json): Config `^3.0.0`, DI `^5.0.0`, broad authentication and transport dependencies.
-- [Latest Auth 4 dependency-audit manifest, bd740de](https://github.com/componenta/auth/blob/bd740de4d766cd01fdac716be125d93369e3de88/composer.json): transport-neutral contracts, Clock and Identity; alias `4.0.x-dev`.
+- [Auth 4 dependency-audit manifest, 9a85ba8](https://github.com/componenta/auth/blob/9a85ba81b820dd93b96bf2ae6f19dae1e7205e58/composer.json): transport-neutral contracts, Clock and Identity; alias `4.0.x-dev`.
 - [Released WebSocket App 2.0.0 manifest, 00f461b](https://github.com/componenta/websocket-app/blob/00f461bf08dbc2914cd759bbf57037e3dafcd9de/composer.json): App `^5.0.0`, Config `^3.0.0`.
 - [WebSocket App runtime branch manifest, 1ba96ed](https://github.com/componenta/websocket-app/blob/1ba96ed6bfcf9edce7479b1dd7776653353f1a8e/composer.json): App `^6.0.0`, Config `^3.0.0`, branch alias `3.0.x-dev`.
 - [WebSocket Server audit manifest, faef384](https://github.com/componenta/websocket-server/blob/faef384d46a2a8788e09c39d3ae8819c3401d7ec/composer.json): Config `^3.0.0`.

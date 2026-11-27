@@ -4,7 +4,7 @@ The implementation was exercised on PHP 8.5.13 with Composer 2.11.3, using an is
 
 ## Executed checks
 
-- 22 suites: **1,603 test cases, 63,820 assertions, 12 version-dependent skips, no failures or errors**. The skips and deliberate warning events are explained below.
+- 22 suites: **1,608 test cases, 63,862 assertions, 12 version-dependent skips, no failures or errors**. The skips and deliberate warning events are explained below.
 - The existing CQRS integration suite is retained: transport, policy, retry, locking and SQLite transactions in source and prepared modes.
 - CQRS App PHPStan runs at the repository's existing maximum level.
 - The real Skeleton installer generates Web, API and CLI projects. Their complete runtime/dev constraints resolve to 122, 119 and 102 packages respectively.
@@ -26,9 +26,13 @@ Publication format 2 isolates internal metadata from valid artifact names, inclu
 
 Router, CQRS and validation tests preserve their existing ordering and runtime semantics. Unsupported validation DTOs use their native provider and create fresh rules. Optional Cycle preparation reads database metadata only when enabled; a real SQLite table and sentinel row remain unchanged after schema preparation.
 
+Cycle's standalone `db:schema` command retains a successful file publication when OPcache API access is restricted. Its subprocess regression verifies that the restriction is active, the initial write and replacement succeed, the generated payload remains valid, and the caller's error handler is restored. Existing failures of incomplete writes and file replacement still report failure. Callable typecasts also retain their original class scope after the generated configuration is loaded inside another class; Cycle App requires VarExport 2.0.1 for this behavior.
+
 The complete Router suite is part of the central gate. It includes source/prepared generation syntax, PCRE option scope, standalone publication with a restricted OPcache API, and optional responder resolution through DI 6. PSR response, middleware and request-handler results bypass responder construction; normalization uses the application's responder and preserves its failures. Router cache schema 20 is exercised through RouterApp, including optional fallback and required-schema rejection for older maps.
 
 RouterApp's intercepted resolver follows the same lazy responder contract. Real source and compiled routes cover PSR results, short-circuit callbacks, callback result transformation and repeated requests. A custom responder that is already lazy initializes only when normalization needs it; callback exceptions retain their identity and DI failures retain their original cause. RouteBuilder token/default inputs and array handlers detach caller-owned reference slots, including across builder clones, without deep-copying opaque values. Route attributes retain independent top-level metadata slots. Repeated named variadic arguments to `methods()` append their values in order instead of replacing an earlier method with the same argument key.
+
+Both native and intercepted route middleware retain their selected callable if the caller later changes reference slots for its receiver or method. Standalone Router artifact path checks preserve literal backslashes in resolved POSIX filenames while retaining protection against source and artifact aliases.
 
 Console bootloader tests verify that custom hosts cannot change accepted command membership through caller-owned PHP references after construction. The standard artifact reader and bootloader factory already return independent payloads; this regression concerns maps passed directly to the public constructor.
 
