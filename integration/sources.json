@@ -312,7 +312,8 @@
                 "args": [
                     "--no-configuration",
                     "--bootstrap=vendor/autoload.php",
-                    "installer/tests"
+                    "installer/tests",
+                    "integration/tests"
                 ]
             }
         },
